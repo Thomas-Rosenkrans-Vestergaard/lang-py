@@ -1,0 +1,13 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+antlr4-python3-runtime = "*"
+io = "*"
+
+[requires]
+python_version = "3.6"
