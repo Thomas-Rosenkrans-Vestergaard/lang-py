@@ -2,7 +2,7 @@ from antlr.LanguageVisitor import *
 from declarations import SymbolTable, UserFunction, Constant
 from exceptions import VariableRedeclarationException, TypeMismatchException, \
     UnknownFunctionException, UnknownReferenceExcpetion
-from value import eval_expression_literal, Type, Value
+from value import eval_expression_literal, Type, Value, get_type_of
 from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 
 from antlr.LanguageLexer import LanguageLexer
@@ -365,12 +365,19 @@ class StatementExecutor(LanguageVisitor):
         expression_dot_acc = ctx.expressionDotAccess()
         if expression_dot_acc is not None:
             raise Exception()
-            # return self.visitExpressionDotAccess(expression_dot_acc)
 
         expression_array_acc = ctx.expressionArrayAccess()
         if expression_array_acc is not None:
-            raise Exception()
-            # return self.visitExpressionArrayAccess(expression_array_acc)
+            subject = self.visitExpressionPrimary(ctx.expressionPrimary())
+            if subject.type != Type.LIST and subject.type != Type.MAP:
+                raise TypeMismatchException("[] called on invalid value.", None, None, None)
+            index = self.visitExpression(expression_array_acc.expression())
+            if index.type != Type.NUMBER:
+                raise TypeMismatchException("Array index must be number", None, index.type, Type.Number)
+            value = subject.value[int(index.value)].value
+
+            return Value(get_type_of(value), value)
+
 
     def visitExpressionParenthesized(self, ctx: LanguageParser.ExpressionParenthesizedContext):
         return self.visitExpression(ctx.expression())
@@ -403,8 +410,7 @@ class StatementExecutor(LanguageVisitor):
 
     def visitExpressionList(self, ctx: LanguageParser.ExpressionListContext):
         new_array = []
-        expressions = ctx.expression()
-        for expression in expressions.items():
+        for expression in ctx.expression():
             new_array.append(self.visitExpression(expression))
 
         return Value(Type.LIST, new_array)

@@ -1,6 +1,6 @@
 from antlr.LanguageListener import *
 from antlr.LanguageVisitor import *
-from value import eval_expression_literal
+from value import eval_expression_literal, Value, Type
 
 
 class Constant:
@@ -25,8 +25,24 @@ class NativeFunction:
         self.name = name
 
     def execute(self, arguments):
-        pass
+        raise Exception("Not implemented")
 
+
+class SizeFunction(NativeFunction):
+
+    def __init__(self):
+        super().__init__("size")
+
+    def execute(self, arguments):
+        sum_size = 0
+        for argument in arguments:
+            sum_size = sum_size + self.size_of(argument)
+
+        return Value(Type.NUMBER, sum_size)
+
+    @staticmethod
+    def size_of(value):
+        return len(value.value)
 
 class PrintFunction(NativeFunction):
 
@@ -62,6 +78,7 @@ class SymbolTable:
 
         self.add_function(PrintFunction())
         self.add_function(PrintLineFunction())
+        self.add_function(SizeFunction())
 
     def add_function(self, function):
         self._functions[function.name] = function

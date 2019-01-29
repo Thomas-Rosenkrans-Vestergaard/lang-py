@@ -71,4 +71,10 @@ for (var o = 1; o <= 10; ++o) {
 print_ln(sum);
 print_ln(recursive_sum(10));
 
+var names = ['Thomas', 'Alexander', 'Martin'];
+for(var x = 0; x < size(names); ++x)
+    print_ln(names[x]);
+
+
+print_ln(size('Alexander'))
 """)

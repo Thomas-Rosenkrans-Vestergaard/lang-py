@@ -37,6 +37,23 @@ class Value:
         return type_names[self.type.value]
 
 
+def get_type_of(value):
+
+    if isinstance(value, int) or isinstance(value, float):
+        return Type.NUMBER
+    if value is None:
+        return Type.NULL
+    if isinstance(value, str):
+        return Type.STRING
+    if isinstance(value, list):
+        return Type.LIST
+    if isinstance(value, dict):
+        return Type.MAP
+    if isinstance(value, bool):
+        return Type.BOOL
+
+    raise Exception("Unknown value type.")
+
 def eval_expression_literal(ctx: LanguageParser.ExpressionLiteralContext):
     bool_value = ctx.BOOL_VAL()
     string_value = ctx.STRING_VAL()
