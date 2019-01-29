@@ -162,7 +162,7 @@ def serializedATN():
         buf.write("\u0152\u0150\3\2\2\2\u0153\u0155\7\b\2\2\u0154\u0153\3")
         buf.write("\2\2\2\u0154\u0155\3\2\2\2\u0155\u0157\3\2\2\2\u0156\u014b")
         buf.write("\3\2\2\2\u0156\u0157\3\2\2\2\u0157\u0158\3\2\2\2\u0158")
-        buf.write("\u0159\7)\2\2\u0159;\3\2\2\2\u015a\u015b\7\60\2\2\u015b")
+        buf.write("\u0159\7)\2\2\u0159;\3\2\2\2\u015a\u015b\5\"\22\2\u015b")
         buf.write("\u015c\7.\2\2\u015c\u015d\5\"\22\2\u015d=\3\2\2\2\u015e")
         buf.write("\u015f\7&\2\2\u015f\u0160\5\"\22\2\u0160\u0161\7\'\2\2")
         buf.write("\u0161?\3\2\2\2\u0162\u0163\7\60\2\2\u0163\u0164\5B\"")
@@ -2644,7 +2644,7 @@ class LanguageParser ( Parser ):
             self.state = 340
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==LanguageParser.IDENTIFIER:
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << LanguageParser.NUMBER_VAL) | (1 << LanguageParser.STRING_VAL) | (1 << LanguageParser.BOOL_VAL) | (1 << LanguageParser.NOT_OP) | (1 << LanguageParser.DEC_OP) | (1 << LanguageParser.INC_OP) | (1 << LanguageParser.TYPE) | (1 << LanguageParser.NULL) | (1 << LanguageParser.PAREN_OPEN) | (1 << LanguageParser.CURLY_OPEN) | (1 << LanguageParser.BRACK_OPEN) | (1 << LanguageParser.IDENTIFIER))) != 0):
                 self.state = 329
                 self.expressionMapEntry()
                 self.state = 334
@@ -2687,15 +2687,15 @@ class LanguageParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def IDENTIFIER(self):
-            return self.getToken(LanguageParser.IDENTIFIER, 0)
+        def expression(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(LanguageParser.ExpressionContext)
+            else:
+                return self.getTypedRuleContext(LanguageParser.ExpressionContext,i)
+
 
         def COLON(self):
             return self.getToken(LanguageParser.COLON, 0)
-
-        def expression(self):
-            return self.getTypedRuleContext(LanguageParser.ExpressionContext,0)
-
 
         def getRuleIndex(self):
             return LanguageParser.RULE_expressionMapEntry
@@ -2724,7 +2724,7 @@ class LanguageParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 344
-            self.match(LanguageParser.IDENTIFIER)
+            self.expression()
             self.state = 345
             self.match(LanguageParser.COLON)
             self.state = 346

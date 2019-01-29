@@ -166,7 +166,7 @@ expressionMap
     ;
 
 expressionMapEntry
-    :   IDENTIFIER COLON expression
+    :   expression COLON expression
     ;
 
 expressionParenthesized

@@ -76,5 +76,15 @@ for(var x = 0; x < size(names); ++x)
     print_ln(names[x]);
 
 
-print_ln(size('Alexander'))
+print_ln('Alexander' != names[1]);
+print_ln(size('Alexander'));
+
+var map = {
+    'Thomas': 'Cool After School',
+    'Alexander': 'Fat'
+};
+
+print_ln(map);
+print_ln(map['Alexander']);
+
 """)

@@ -1,1 +1,1 @@
-java -jar C:\Users\Skole\Desktop\antlr.jar -Dlanguage=Python3 Language.g4 -listener -visitor
+java -jar .\antlr-4.7.2-complete.jar -Dlanguage=Python3 Language.g4 -listener -visitor

@@ -15,7 +15,6 @@ class ProgramExecutor:
         lexer = LanguageLexer(InputStream(code_text))
         stream = CommonTokenStream(lexer)
         parser = LanguageParser(stream)
-        walker = ParseTreeWalker()
         tree = parser.program()
         executor = StatementExecutor(SymbolTable(), RuntimeStack())
         executor.visitProgram(tree)
@@ -370,14 +369,16 @@ class StatementExecutor(LanguageVisitor):
         if expression_array_acc is not None:
             subject = self.visitExpressionPrimary(ctx.expressionPrimary())
             if subject.type != Type.LIST and subject.type != Type.MAP:
-                raise TypeMismatchException("[] called on invalid value.", None, None, None)
+                raise TypeMismatchException("[] applied to invalid value.", None, None, None)
             index = self.visitExpression(expression_array_acc.expression())
-            if index.type != Type.NUMBER:
-                raise TypeMismatchException("Array index must be number", None, index.type, Type.Number)
-            value = subject.value[int(index.value)].value
+            if subject.type == Type.LIST and index.type != Type.NUMBER:
+                raise TypeMismatchException("List index must be number", None, index.type, Type.Number)
+            if subject.type == Type.LIST:
+                value = subject.value[int(index.value)].value
+            else:
+                value = subject.value[index.value].value
 
             return Value(get_type_of(value), value)
-
 
     def visitExpressionParenthesized(self, ctx: LanguageParser.ExpressionParenthesizedContext):
         return self.visitExpression(ctx.expression())
@@ -419,8 +420,9 @@ class StatementExecutor(LanguageVisitor):
         new_map = {}
         entries = ctx.expressionMapEntry()
         for entry in entries:
-            key = entry.IDENTIFIER().getText()
-            val = self.visitExpression(entry.expression())
+            expressions = entry.expression()
+            key = self.visitExpression(expressions[0]).value
+            val = self.visitExpression(expressions[1])
             new_map[key] = val
 
         return Value(Type.MAP, new_map)
