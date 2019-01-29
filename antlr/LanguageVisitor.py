@@ -26,11 +26,6 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#functionBody.
-    def visitFunctionBody(self, ctx:LanguageParser.FunctionBodyContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by LanguageParser#functionSignature.
     def visitFunctionSignature(self, ctx:LanguageParser.FunctionSignatureContext):
         return self.visitChildren(ctx)
@@ -51,6 +46,11 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LanguageParser#statementAssignment.
+    def visitStatementAssignment(self, ctx:LanguageParser.StatementAssignmentContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LanguageParser#statementReturn.
     def visitStatementReturn(self, ctx:LanguageParser.StatementReturnContext):
         return self.visitChildren(ctx)
@@ -58,6 +58,11 @@ class LanguageVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LanguageParser#statementIf.
     def visitStatementIf(self, ctx:LanguageParser.StatementIfContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#statementElse.
+    def visitStatementElse(self, ctx:LanguageParser.StatementElseContext):
         return self.visitChildren(ctx)
 
 
@@ -106,13 +111,13 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#expressionMultiplicative.
-    def visitExpressionMultiplicative(self, ctx:LanguageParser.ExpressionMultiplicativeContext):
+    # Visit a parse tree produced by LanguageParser#expressionAdditive.
+    def visitExpressionAdditive(self, ctx:LanguageParser.ExpressionAdditiveContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#expressionAdditive.
-    def visitExpressionAdditive(self, ctx:LanguageParser.ExpressionAdditiveContext):
+    # Visit a parse tree produced by LanguageParser#expressionMultiplicative.
+    def visitExpressionMultiplicative(self, ctx:LanguageParser.ExpressionMultiplicativeContext):
         return self.visitChildren(ctx)
 
 

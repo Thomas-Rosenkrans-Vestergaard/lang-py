@@ -41,15 +41,6 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LanguageParser#functionBody.
-    def enterFunctionBody(self, ctx:LanguageParser.FunctionBodyContext):
-        pass
-
-    # Exit a parse tree produced by LanguageParser#functionBody.
-    def exitFunctionBody(self, ctx:LanguageParser.FunctionBodyContext):
-        pass
-
-
     # Enter a parse tree produced by LanguageParser#functionSignature.
     def enterFunctionSignature(self, ctx:LanguageParser.FunctionSignatureContext):
         pass
@@ -83,6 +74,15 @@ class LanguageListener(ParseTreeListener):
 
     # Exit a parse tree produced by LanguageParser#statementVariableDeclaration.
     def exitStatementVariableDeclaration(self, ctx:LanguageParser.StatementVariableDeclarationContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#statementAssignment.
+    def enterStatementAssignment(self, ctx:LanguageParser.StatementAssignmentContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#statementAssignment.
+    def exitStatementAssignment(self, ctx:LanguageParser.StatementAssignmentContext):
         pass
 
 
@@ -194,21 +194,21 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LanguageParser#expressionMultiplicative.
-    def enterExpressionMultiplicative(self, ctx:LanguageParser.ExpressionMultiplicativeContext):
-        pass
-
-    # Exit a parse tree produced by LanguageParser#expressionMultiplicative.
-    def exitExpressionMultiplicative(self, ctx:LanguageParser.ExpressionMultiplicativeContext):
-        pass
-
-
     # Enter a parse tree produced by LanguageParser#expressionAdditive.
     def enterExpressionAdditive(self, ctx:LanguageParser.ExpressionAdditiveContext):
         pass
 
     # Exit a parse tree produced by LanguageParser#expressionAdditive.
     def exitExpressionAdditive(self, ctx:LanguageParser.ExpressionAdditiveContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#expressionMultiplicative.
+    def enterExpressionMultiplicative(self, ctx:LanguageParser.ExpressionMultiplicativeContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#expressionMultiplicative.
+    def exitExpressionMultiplicative(self, ctx:LanguageParser.ExpressionMultiplicativeContext):
         pass
 
 

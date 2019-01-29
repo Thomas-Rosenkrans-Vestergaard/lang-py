@@ -16,12 +16,7 @@ declarationConstant
     ;
 
 declarationFunction
-    :   FUNC functionSignature functionBody
-    ;
-
-functionBody
-    :   (ASSIGN_OP expression SEMI)
-    |   (CURLY_OPEN statement* CURLY_CLOSE)
+    :   FUNC functionSignature codeBlock
     ;
 
 functionSignature
@@ -36,6 +31,7 @@ functionParameters
 
 statement
     :   statementVariableDeclaration
+    |   statementAssignment
     |   statementReturn
     |   statementIf
     |   statementFor
@@ -45,6 +41,10 @@ statement
 
 statementVariableDeclaration
     :   VAR IDENTIFIER ASSIGN_OP expression SEMI
+    ;
+
+statementAssignment
+    :   IDENTIFIER ASSIGN_OP expression SEMI
     ;
 
 statementReturn
@@ -102,25 +102,26 @@ expressionEquality
     ;
 
 expressionRelational
+    :   expressionAdditive
+    |   expressionRelational LT_OP expressionAdditive
+    |   expressionRelational LTOE_OP expressionAdditive
+    |   expressionRelational GT_OP expressionAdditive
+    |   expressionRelational GTOE_OP expressionAdditive
+    ;
+
+
+expressionAdditive
     :   expressionMultiplicative
-    |   expressionRelational LT_OP expressionMultiplicative
-    |   expressionRelational LTOE_OP expressionMultiplicative
-    |   expressionRelational GT_OP expressionMultiplicative
-    |   expressionRelational GTOE_OP expressionMultiplicative
+    |   expressionAdditive ADD_OP expressionMultiplicative
+    |   expressionAdditive SUB_OP expressionMultiplicative
     ;
 
 expressionMultiplicative
-    :   expressionAdditive
-    |   expressionMultiplicative MUL_OP expressionAdditive
-    |   expressionMultiplicative DIV_OP expressionAdditive
-    |   expressionMultiplicative MOD_OP expressionAdditive
-    |   expressionMultiplicative EXP_OP expressionAdditive
-    ;
-
-expressionAdditive
     :   expressionUnary
-    |   expressionAdditive ADD_OP expressionUnary
-    |   expressionAdditive SUB_OP expressionUnary
+    |   expressionMultiplicative MUL_OP expressionUnary
+    |   expressionMultiplicative DIV_OP expressionUnary
+    |   expressionMultiplicative MOD_OP expressionUnary
+    |   expressionMultiplicative EXP_OP expressionUnary
     ;
 
 expressionUnary

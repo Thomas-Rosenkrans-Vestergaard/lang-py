@@ -18,8 +18,7 @@
     "default": {
         "antlr4-python3-runtime": {
             "hashes": [
-                "sha256:168cdcec8fb9152e84a87ca6fd261b3d54c8f6358f42ab3b813b14a7193bb50b",
-                "sha256:44974557a5cd1051bc4863ee83834b753af044d395ce44c7ca93c7e30771481c"
+                "sha256:168cdcec8fb9152e84a87ca6fd261b3d54c8f6358f42ab3b813b14a7193bb50b"
             ],
             "index": "pypi",
             "version": "==4.7.2"

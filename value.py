@@ -4,12 +4,12 @@ from exceptions import InternalException
 
 
 class Type(Enum):
-    NUMBER = 1
-    STRING = 2
-    BOOL = 3
-    NULL = 4
-    LIST = 5
-    MAP = 6
+    NUMBER = 0
+    STRING = 1
+    BOOL = 2
+    NULL = 3
+    LIST = 4
+    MAP = 5
 
 
 class Value:
@@ -18,18 +18,24 @@ class Value:
         self.type = type
         self.value = value
 
+    def to_string(self):
+        if self.type == Type.BOOL:
+            return "true" if self.value else "false"
+        return str(self.value)
+
     def get_type_name(self):
-        return get_type_name(self.type)
 
+        type_names = [
+            "number",
+            "string",
+            "bool",
+            "null",
+            "list",
+            "map",
+        ]
 
-type_names = {
-        Type.STRING: "string",
-        Type.NULL: "null",
-        Type.NUMBER: "number",
-        Type.BOOL: "bool",
-        Type.MAP: "map",
-        Type.LIST: "list"
-}
+        return type_names[self.type.value]
+
 
 def eval_expression_literal(ctx: LanguageParser.ExpressionLiteralContext):
     bool_value = ctx.BOOL_VAL()
@@ -63,6 +69,3 @@ def string_literal_to_value(ctx):
 def number_literal_to_value(ctx):
     return Value(Type.NUMBER, float(ctx.getText()))
 
-
-def get_type_name(type):
-    return type_names.get(type)

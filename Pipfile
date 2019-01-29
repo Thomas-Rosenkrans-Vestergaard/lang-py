@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 antlr4-python3-runtime = "*"
-io = "*"
 
 [requires]
 python_version = "3.6"

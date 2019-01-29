@@ -13,13 +13,10 @@ class Constant:
 
 class UserFunction:
 
-    def __init__(self, name, arguments, code):
+    def __init__(self, name, parameters, code):
         self.name = name
-        self.arguments = arguments
+        self.parameters = parameters
         self.code = code
-
-    def execute(self, arguments):
-        pass
 
 
 class NativeFunction:
@@ -38,7 +35,7 @@ class PrintFunction(NativeFunction):
 
     def execute(self, arguments):
         for argument in arguments:
-            print(argument.value)
+            print(argument.to_string(), end="")
 
 
 class PrintLineFunction(NativeFunction):
@@ -48,7 +45,8 @@ class PrintLineFunction(NativeFunction):
 
     def execute(self, arguments):
         for argument in arguments:
-            print(str(argument.value) + "\n")
+            print(str(argument.to_string()))
+
 
 class SymbolTable:
 
@@ -61,6 +59,12 @@ class SymbolTable:
 
         self._functions = functions
         self._constants = constants
+
+        self.add_function(PrintFunction())
+        self.add_function(PrintLineFunction())
+
+    def add_function(self, function):
+        self._functions[function.name] = function
 
     def get_declared_functions(self):
         return self._functions
@@ -75,30 +79,5 @@ class SymbolTable:
         found = self._constants.get(name)
         return found and found.value
 
-
-class SymbolTablePopulator(LanguageListener):
-
-    def __init__(self):
-        self._functions = {}
-        self._constants = {}
-
-    def enterDeclarationFunction(self, ctx: LanguageParser.DeclarationFunctionContext):
-        name = ctx.functionSignature().IDENTIFIER()
-        self._functions[name] = UserFunction(name, self._get_function_arguments(ctx), self._get_function_code(ctx))
-
-    @staticmethod
-    def _get_function_arguments(ctx: LanguageParser.DeclarationFunctionContext):
-        identifiers = ctx.functionSignature().functionParameters().IDENTIFIER()
-        return list(map(lambda i: i.getText(), identifiers))
-
-    @staticmethod
-    def _get_function_code(ctx: LanguageParser.DeclarationFunctionContext):
-        return ctx.functionBody()
-
-    def enterDeclarationConstant(self, ctx: LanguageParser.DeclarationConstantContext):
-        name = ctx.IDENTIFIER().getText()
-        value = eval_expression_literal(ctx.expressionLiteral())
-        self._constants[name] = Constant(name, value, ctx)
-
-    def get_table(self):
-        return SymbolTable(self._functions, self._constants)
+    def add_constant(self, constant):
+        self._constants[constant] = constant
