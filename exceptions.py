@@ -48,7 +48,7 @@ class UnknownFunctionException(RuntimeException):
 
 class TypeMismatchException(RuntimeException):
 
-    def __init__(self, user_message, code, found, expected):
+    def __init__(self, user_message, code=None, found=None, expected=None):
         super().__init__(user_message, code)
         self.type_one = found
         self.type_two = expected

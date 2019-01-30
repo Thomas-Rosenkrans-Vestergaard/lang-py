@@ -141,15 +141,20 @@ expressionPrimary
     |   expressionList
     |   expressionMap
     |   expressionLiteral
-    |   expressionPrimary expressionDotAccess
-    |   expressionPrimary expressionArrayAccess
+    |   expressionPrimary expressionFieldAccess
+    |   expressionPrimary expressionMethodAccess
+    |   expressionPrimary expressionBracketAccess
     ;
 
-expressionDotAccess
+expressionFieldAccess
     :   DOT IDENTIFIER
     ;
 
-expressionArrayAccess
+expressionMethodAccess
+    :   DOT IDENTIFIER arguments
+    ;
+
+expressionBracketAccess
     :   BRACK_OPEN expression BRACK_CLOSE
     ;
 
@@ -174,10 +179,10 @@ expressionParenthesized
     ;
 
 expressionFunction
-    :   IDENTIFIER functionArguments
+    :   IDENTIFIER arguments
     ;
 
-functionArguments
+arguments
     :   PAREN_OPEN
         (expression (COMMA expression)*)?
         PAREN_CLOSE

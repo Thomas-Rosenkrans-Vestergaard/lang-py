@@ -230,21 +230,30 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LanguageParser#expressionDotAccess.
-    def enterExpressionDotAccess(self, ctx:LanguageParser.ExpressionDotAccessContext):
+    # Enter a parse tree produced by LanguageParser#expressionFieldAccess.
+    def enterExpressionFieldAccess(self, ctx:LanguageParser.ExpressionFieldAccessContext):
         pass
 
-    # Exit a parse tree produced by LanguageParser#expressionDotAccess.
-    def exitExpressionDotAccess(self, ctx:LanguageParser.ExpressionDotAccessContext):
+    # Exit a parse tree produced by LanguageParser#expressionFieldAccess.
+    def exitExpressionFieldAccess(self, ctx:LanguageParser.ExpressionFieldAccessContext):
         pass
 
 
-    # Enter a parse tree produced by LanguageParser#expressionArrayAccess.
-    def enterExpressionArrayAccess(self, ctx:LanguageParser.ExpressionArrayAccessContext):
+    # Enter a parse tree produced by LanguageParser#expressionMethodAccess.
+    def enterExpressionMethodAccess(self, ctx:LanguageParser.ExpressionMethodAccessContext):
         pass
 
-    # Exit a parse tree produced by LanguageParser#expressionArrayAccess.
-    def exitExpressionArrayAccess(self, ctx:LanguageParser.ExpressionArrayAccessContext):
+    # Exit a parse tree produced by LanguageParser#expressionMethodAccess.
+    def exitExpressionMethodAccess(self, ctx:LanguageParser.ExpressionMethodAccessContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#expressionBracketAccess.
+    def enterExpressionBracketAccess(self, ctx:LanguageParser.ExpressionBracketAccessContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#expressionBracketAccess.
+    def exitExpressionBracketAccess(self, ctx:LanguageParser.ExpressionBracketAccessContext):
         pass
 
 
@@ -293,12 +302,12 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LanguageParser#functionArguments.
-    def enterFunctionArguments(self, ctx:LanguageParser.FunctionArgumentsContext):
+    # Enter a parse tree produced by LanguageParser#arguments.
+    def enterArguments(self, ctx:LanguageParser.ArgumentsContext):
         pass
 
-    # Exit a parse tree produced by LanguageParser#functionArguments.
-    def exitFunctionArguments(self, ctx:LanguageParser.FunctionArgumentsContext):
+    # Exit a parse tree produced by LanguageParser#arguments.
+    def exitArguments(self, ctx:LanguageParser.ArgumentsContext):
         pass
 
 

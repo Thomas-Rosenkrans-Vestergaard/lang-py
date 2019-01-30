@@ -86,5 +86,6 @@ var map = {
 
 print_ln(map);
 print_ln(map['Alexander']);
+print_ln(size(map));
 
 """)

@@ -131,13 +131,18 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#expressionDotAccess.
-    def visitExpressionDotAccess(self, ctx:LanguageParser.ExpressionDotAccessContext):
+    # Visit a parse tree produced by LanguageParser#expressionFieldAccess.
+    def visitExpressionFieldAccess(self, ctx:LanguageParser.ExpressionFieldAccessContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#expressionArrayAccess.
-    def visitExpressionArrayAccess(self, ctx:LanguageParser.ExpressionArrayAccessContext):
+    # Visit a parse tree produced by LanguageParser#expressionMethodAccess.
+    def visitExpressionMethodAccess(self, ctx:LanguageParser.ExpressionMethodAccessContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#expressionBracketAccess.
+    def visitExpressionBracketAccess(self, ctx:LanguageParser.ExpressionBracketAccessContext):
         return self.visitChildren(ctx)
 
 
@@ -166,8 +171,8 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#functionArguments.
-    def visitFunctionArguments(self, ctx:LanguageParser.FunctionArgumentsContext):
+    # Visit a parse tree produced by LanguageParser#arguments.
+    def visitArguments(self, ctx:LanguageParser.ArgumentsContext):
         return self.visitChildren(ctx)
 
 

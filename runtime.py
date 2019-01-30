@@ -22,7 +22,9 @@ class ProgramExecutor:
 
 class RuntimeStack:
 
-    def __init__(self, initial_frames=[]):
+    def __init__(self, initial_frames=None):
+        if initial_frames is None:
+            initial_frames = []
         self._frames = initial_frames
 
     def pop(self):
@@ -148,8 +150,6 @@ class StatementExecutor(LanguageVisitor):
 
         return ret
 
-
-
     def visitStatementIf(self, ctx: LanguageParser.StatementIfContext):
         conditional = self.visitExpression(ctx.expression())
         if conditional.type is not Type.BOOL:
@@ -228,7 +228,7 @@ class StatementExecutor(LanguageVisitor):
 
             if ctx.EQ_OP():
                 result = operand_one.value == operand_two.value
-            elif ctx.NEQ_OP():
+            else:  # NOT EQ
                 result = operand_one.value != operand_two.value
 
             return Value(Type.BOOL, result)
@@ -244,8 +244,7 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionAdditive(expression_additive)
 
             if operand_one.type is not Type.NUMBER or operand_two.type is not Type.NUMBER:
-                raise TypeMismatchException("The relational operators can only be applied to values of type NUMBER.",
-                                            [])
+                raise TypeMismatchException("The relational operators can only be applied to values of type NUMBER.")
 
             if ctx.LT_OP():
                 result = operand_one.value < operand_two.value
@@ -268,12 +267,11 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionMultiplicative(ctx.expressionMultiplicative())
 
             if operand_one.type is not Type.NUMBER or operand_two.type is not Type.NUMBER:
-                raise TypeMismatchException("The additive operators can only be applied to values of type NUMBER.",
-                                            [])
+                raise TypeMismatchException("The additive operators can only be applied to values of type NUMBER.")
 
             if ctx.ADD_OP():
                 result = operand_one.value + operand_two.value
-            elif ctx.SUB_OP():
+            else:  # SUB
                 result = operand_one.value - operand_two.value
 
             return Value(Type.NUMBER, result)
@@ -287,7 +285,7 @@ class StatementExecutor(LanguageVisitor):
 
             if operand_one.type is not Type.NUMBER or operand_two.type is not Type.NUMBER:
                 raise TypeMismatchException(
-                    "The multiplicative operators can only be applied to values of type NUMBER.", [])
+                    "The multiplicative operators can only be applied to values of type NUMBER.")
 
             if ctx.MUL_OP():
                 result = operand_one.value * operand_two.value
@@ -309,7 +307,7 @@ class StatementExecutor(LanguageVisitor):
         if ctx.NOT_OP():
             operand = self.visitExpressionPrimary(ctx.expressionPrimary())
             if operand.type is not Type.BOOL:
-                raise TypeMismatchException("The not operator (!) can only be applied to values of type BOOL.", [])
+                raise TypeMismatchException("The not operator (!) can only be applied to values of type BOOL.")
 
             return Value(Type.BOOL, not operand.value)
 
@@ -320,7 +318,7 @@ class StatementExecutor(LanguageVisitor):
         if ctx.DEC_OP():
             operand = self.visitExpressionPrimary(ctx.expressionPrimary())
             if operand.type is not Type.NUMBER:
-                raise TypeMismatchException("The not dec (--) can only be applied to values of type NUMBER.", [])
+                raise TypeMismatchException("The not dec (--) can only be applied to values of type NUMBER.")
 
             operand.value = operand.value - 1
             return operand
@@ -328,7 +326,7 @@ class StatementExecutor(LanguageVisitor):
         if ctx.INC_OP():
             operand = self.visitExpressionPrimary(ctx.expressionPrimary())
             if operand.type is not Type.NUMBER:
-                raise TypeMismatchException("The not dec (++) can only be applied to values of type NUMBER.", [])
+                raise TypeMismatchException("The not dec (++) can only be applied to values of type NUMBER.")
 
             operand.value = operand.value + 1
             return operand
@@ -361,16 +359,20 @@ class StatementExecutor(LanguageVisitor):
         if expression_lit is not None:
             return self.visitExpressionLiteral(expression_lit)
 
-        expression_dot_acc = ctx.expressionDotAccess()
-        if expression_dot_acc is not None:
-            raise Exception()
+        field_access = ctx.expressionFieldAccess()
+        if field_access is not None:
+            raise Exception("Unsupported")
 
-        expression_array_acc = ctx.expressionArrayAccess()
-        if expression_array_acc is not None:
+        method_access = ctx.expressionMethodAccess()
+        if method_access is not None:
+            raise Exception("Unsupported")
+
+        bracket_access = ctx.expressionBracketAccess()
+        if bracket_access is not None:
             subject = self.visitExpressionPrimary(ctx.expressionPrimary())
             if subject.type != Type.LIST and subject.type != Type.MAP:
-                raise TypeMismatchException("[] applied to invalid value.", None, None, None)
-            index = self.visitExpression(expression_array_acc.expression())
+                raise TypeMismatchException("[] applied to invalid value.")
+            index = self.visitExpression(bracket_access.expression())
             if subject.type == Type.LIST and index.type != Type.NUMBER:
                 raise TypeMismatchException("List index must be number", None, index.type, Type.Number)
             if subject.type == Type.LIST:
@@ -389,7 +391,7 @@ class StatementExecutor(LanguageVisitor):
         if function is None:
             raise UnknownFunctionException(function_name, [])
 
-        arguments = map(lambda expression: self.visitExpression(expression), ctx.functionArguments().expression())
+        arguments = map(lambda expression: self.visitExpression(expression), ctx.arguments().expression())
 
         if isinstance(function, UserFunction):
             new_frame = Frame()
