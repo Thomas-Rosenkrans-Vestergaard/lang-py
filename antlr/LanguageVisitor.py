@@ -26,13 +26,28 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LanguageParser#declarationClass.
+    def visitDeclarationClass(self, ctx:LanguageParser.DeclarationClassContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#declarationField.
+    def visitDeclarationField(self, ctx:LanguageParser.DeclarationFieldContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#declarationConstructor.
+    def visitDeclarationConstructor(self, ctx:LanguageParser.DeclarationConstructorContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LanguageParser#functionSignature.
     def visitFunctionSignature(self, ctx:LanguageParser.FunctionSignatureContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#functionParameters.
-    def visitFunctionParameters(self, ctx:LanguageParser.FunctionParametersContext):
+    # Visit a parse tree produced by LanguageParser#parameters.
+    def visitParameters(self, ctx:LanguageParser.ParametersContext):
         return self.visitChildren(ctx)
 
 
@@ -53,6 +68,11 @@ class LanguageVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LanguageParser#statementAssignmentBracket.
     def visitStatementAssignmentBracket(self, ctx:LanguageParser.StatementAssignmentBracketContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#statementAssignmentField.
+    def visitStatementAssignmentField(self, ctx:LanguageParser.StatementAssignmentFieldContext):
         return self.visitChildren(ctx)
 
 
@@ -138,6 +158,11 @@ class LanguageVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LanguageParser#expressionFieldAccess.
     def visitExpressionFieldAccess(self, ctx:LanguageParser.ExpressionFieldAccessContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#expressionNew.
+    def visitExpressionNew(self, ctx:LanguageParser.ExpressionNewContext):
         return self.visitChildren(ctx)
 
 

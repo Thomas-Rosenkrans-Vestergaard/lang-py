@@ -61,7 +61,7 @@ class StatementExecutor(LanguageVisitor):
 
     @staticmethod
     def _get_function_arguments(ctx: LanguageParser.DeclarationFunctionContext):
-        identifiers = ctx.functionSignature().functionParameters().IDENTIFIER()
+        identifiers = ctx.functionSignature().parameters().IDENTIFIER()
         return list(map(lambda i: i.getText(), identifiers))
 
     @staticmethod
@@ -384,11 +384,15 @@ class StatementExecutor(LanguageVisitor):
 
         field_access = ctx.expressionFieldAccess()
         if field_access is not None:
-            raise Exception("Unsupported")
+            raise Exception("Unsupported: field access")
 
         method_access = ctx.expressionMethodAccess()
         if method_access is not None:
-            raise Exception("Unsupported")
+            raise Exception("Unsupported: method call")
+
+        new_expression = ctx.expressionNew()
+        if new_expression is not None:
+            raise Exception("Unsupported: new keyword")
 
         bracket_access = ctx.expressionBracketAccess()
         if bracket_access is not None:

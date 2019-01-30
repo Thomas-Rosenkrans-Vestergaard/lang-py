@@ -41,6 +41,33 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LanguageParser#declarationClass.
+    def enterDeclarationClass(self, ctx:LanguageParser.DeclarationClassContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#declarationClass.
+    def exitDeclarationClass(self, ctx:LanguageParser.DeclarationClassContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#declarationField.
+    def enterDeclarationField(self, ctx:LanguageParser.DeclarationFieldContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#declarationField.
+    def exitDeclarationField(self, ctx:LanguageParser.DeclarationFieldContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#declarationConstructor.
+    def enterDeclarationConstructor(self, ctx:LanguageParser.DeclarationConstructorContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#declarationConstructor.
+    def exitDeclarationConstructor(self, ctx:LanguageParser.DeclarationConstructorContext):
+        pass
+
+
     # Enter a parse tree produced by LanguageParser#functionSignature.
     def enterFunctionSignature(self, ctx:LanguageParser.FunctionSignatureContext):
         pass
@@ -50,12 +77,12 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LanguageParser#functionParameters.
-    def enterFunctionParameters(self, ctx:LanguageParser.FunctionParametersContext):
+    # Enter a parse tree produced by LanguageParser#parameters.
+    def enterParameters(self, ctx:LanguageParser.ParametersContext):
         pass
 
-    # Exit a parse tree produced by LanguageParser#functionParameters.
-    def exitFunctionParameters(self, ctx:LanguageParser.FunctionParametersContext):
+    # Exit a parse tree produced by LanguageParser#parameters.
+    def exitParameters(self, ctx:LanguageParser.ParametersContext):
         pass
 
 
@@ -92,6 +119,15 @@ class LanguageListener(ParseTreeListener):
 
     # Exit a parse tree produced by LanguageParser#statementAssignmentBracket.
     def exitStatementAssignmentBracket(self, ctx:LanguageParser.StatementAssignmentBracketContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#statementAssignmentField.
+    def enterStatementAssignmentField(self, ctx:LanguageParser.StatementAssignmentFieldContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#statementAssignmentField.
+    def exitStatementAssignmentField(self, ctx:LanguageParser.StatementAssignmentFieldContext):
         pass
 
 
@@ -245,6 +281,15 @@ class LanguageListener(ParseTreeListener):
 
     # Exit a parse tree produced by LanguageParser#expressionFieldAccess.
     def exitExpressionFieldAccess(self, ctx:LanguageParser.ExpressionFieldAccessContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#expressionNew.
+    def enterExpressionNew(self, ctx:LanguageParser.ExpressionNewContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#expressionNew.
+    def exitExpressionNew(self, ctx:LanguageParser.ExpressionNewContext):
         pass
 
 

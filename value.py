@@ -10,6 +10,7 @@ class Type(Enum):
     NULL = 3
     LIST = 4
     MAP = 5
+    OBJECT = 6
 
 
 class Value:
@@ -56,6 +57,7 @@ def get_type_of(value):
         return Type.BOOL
 
     raise Exception("Unknown value type.")
+
 
 def eval_expression_literal(ctx: LanguageParser.ExpressionLiteralContext):
     bool_value = ctx.BOOL_VAL()

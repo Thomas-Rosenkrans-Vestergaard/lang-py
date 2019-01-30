@@ -8,6 +8,21 @@ def run(code):
 
 run("""
 
+class Person {
+    
+    var name;
+    var age;
+    
+    new(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    func get_name() {
+        return this.name;
+    }
+}
+
 const NAME = 'Thomas';
 const COOL = true;
 const PI = 3.14;
@@ -91,5 +106,12 @@ print_ln(size(map));
 map['Kasper'] = 'Nice';
 print_ln(map['Kasper']);
 print_ln(map['Unknown']);
+
+var numbers = [1, 2, 3];
+numbers[0] = 5;
+print_ln(numbers[0]);
+
+var person = new Person('Thomas', 21);
+print_ln(person.get_name());
 
 """)

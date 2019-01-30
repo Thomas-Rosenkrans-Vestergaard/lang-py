@@ -9,6 +9,7 @@ program
 declaration
     :   declarationFunction
     |   declarationConstant
+    |   declarationClass
     ;
 
 declarationConstant
@@ -19,11 +20,27 @@ declarationFunction
     :   FUNC functionSignature codeBlock
     ;
 
-functionSignature
-    :   IDENTIFIER functionParameters?
+declarationClass
+    :   CLASS IDENTIFIER CURLY_OPEN
+        declarationField*
+        declarationConstructor?
+        declarationFunction*
+        CURLY_CLOSE
     ;
 
-functionParameters
+declarationField
+    :   VAR IDENTIFIER (ASSIGN_OP expression)? SEMI
+    ;
+
+declarationConstructor
+    :   NEW parameters codeBlock
+    ;
+
+functionSignature
+    :   IDENTIFIER parameters?
+    ;
+
+parameters
     :   PAREN_OPEN
         (IDENTIFIER (COMMA IDENTIFIER)*)?
         PAREN_CLOSE
@@ -33,6 +50,7 @@ statement
     :   statementVariableDeclaration
     |   statementAssignmentVariable
     |   statementAssignmentBracket
+    |   statementAssignmentField
     |   statementReturn
     |   statementIf
     |   statementFor
@@ -50,6 +68,10 @@ statementAssignmentVariable
 
 statementAssignmentBracket
     :   expressionPrimary expressionBracketAccess ASSIGN_OP expression SEMI
+    ;
+
+statementAssignmentField
+    :   expressionPrimary expressionFieldAccess ASSIGN_OP expression SEMI
     ;
 
 statementReturn
@@ -141,6 +163,7 @@ expressionUnary
 
 expressionPrimary
     :   expressionParenthesized
+    |   expressionNew
     |   expressionFunction
     |   expressionVariable
     |   expressionList
@@ -153,6 +176,10 @@ expressionPrimary
 
 expressionFieldAccess
     :   DOT IDENTIFIER
+    ;
+
+expressionNew
+    :   NEW IDENTIFIER arguments
     ;
 
 expressionMethodAccess
@@ -195,6 +222,7 @@ arguments
 
 expressionVariable
     :   IDENTIFIER
+    |   THIS
     ;
 
 expressionLiteral
@@ -241,6 +269,9 @@ ELSE   : 'else';
 TRUE   : 'true';
 FALSE  : 'false';
 NULL   : 'null';
+CLASS  : 'class';
+THIS   : 'this';
+NEW    : 'new';
 
 PAREN_OPEN  : '(';
 PAREN_CLOSE : ')';
