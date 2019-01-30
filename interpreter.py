@@ -88,4 +88,8 @@ print_ln(map);
 print_ln(map['Alexander']);
 print_ln(size(map));
 
+map['Kasper'] = 'Nice';
+print_ln(map['Kasper']);
+print_ln(map['Unknown']);
+
 """)

@@ -21,6 +21,9 @@ class Value:
     def to_string(self):
         if self.type == Type.BOOL:
             return "true" if self.value else "false"
+        if self.type == Type.NULL:
+            return "null"
+
         return str(self.value)
 
     def get_type_name(self):

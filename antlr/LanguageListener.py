@@ -77,12 +77,21 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by LanguageParser#statementAssignment.
-    def enterStatementAssignment(self, ctx:LanguageParser.StatementAssignmentContext):
+    # Enter a parse tree produced by LanguageParser#statementAssignmentVariable.
+    def enterStatementAssignmentVariable(self, ctx:LanguageParser.StatementAssignmentVariableContext):
         pass
 
-    # Exit a parse tree produced by LanguageParser#statementAssignment.
-    def exitStatementAssignment(self, ctx:LanguageParser.StatementAssignmentContext):
+    # Exit a parse tree produced by LanguageParser#statementAssignmentVariable.
+    def exitStatementAssignmentVariable(self, ctx:LanguageParser.StatementAssignmentVariableContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#statementAssignmentBracket.
+    def enterStatementAssignmentBracket(self, ctx:LanguageParser.StatementAssignmentBracketContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#statementAssignmentBracket.
+    def exitStatementAssignmentBracket(self, ctx:LanguageParser.StatementAssignmentBracketContext):
         pass
 
 

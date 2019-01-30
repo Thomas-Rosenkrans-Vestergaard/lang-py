@@ -46,8 +46,13 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by LanguageParser#statementAssignment.
-    def visitStatementAssignment(self, ctx:LanguageParser.StatementAssignmentContext):
+    # Visit a parse tree produced by LanguageParser#statementAssignmentVariable.
+    def visitStatementAssignmentVariable(self, ctx:LanguageParser.StatementAssignmentVariableContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#statementAssignmentBracket.
+    def visitStatementAssignmentBracket(self, ctx:LanguageParser.StatementAssignmentBracketContext):
         return self.visitChildren(ctx)
 
 

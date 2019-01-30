@@ -31,7 +31,8 @@ functionParameters
 
 statement
     :   statementVariableDeclaration
-    |   statementAssignment
+    |   statementAssignmentVariable
+    |   statementAssignmentBracket
     |   statementReturn
     |   statementIf
     |   statementFor
@@ -43,8 +44,12 @@ statementVariableDeclaration
     :   VAR IDENTIFIER ASSIGN_OP expression SEMI
     ;
 
-statementAssignment
+statementAssignmentVariable
     :   IDENTIFIER ASSIGN_OP expression SEMI
+    ;
+
+statementAssignmentBracket
+    :   expressionPrimary expressionBracketAccess ASSIGN_OP expression SEMI
     ;
 
 statementReturn

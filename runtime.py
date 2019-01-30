@@ -1,9 +1,8 @@
 from antlr.LanguageVisitor import *
 from declarations import SymbolTable, UserFunction, Constant
-from exceptions import VariableRedeclarationException, TypeMismatchException, \
-    UnknownFunctionException, UnknownReferenceExcpetion
+import exceptions
 from value import eval_expression_literal, Type, Value, get_type_of
-from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
+from antlr4 import InputStream, CommonTokenStream
 
 from antlr.LanguageLexer import LanguageLexer
 from antlr.LanguageParser import LanguageParser
@@ -96,8 +95,10 @@ class StatementExecutor(LanguageVisitor):
 
         if ctx.statementVariableDeclaration():
             return self.visitStatementVariableDeclaration(ctx.statementVariableDeclaration())
-        if ctx.statementAssignment():
-            return self.visitStatementAssignment(ctx.statementAssignment())
+        if ctx.statementAssignmentVariable():
+            return self.visitStatementAssignmentVariable(ctx.statementAssignmentVariable())
+        if ctx.statementAssignmentBracket():
+            return self.visitStatementAssignmentBracket(ctx.statementAssignmentBracket())
         if ctx.statementReturn():
             return self.visitStatementReturn(ctx.statementReturn())
         if ctx.statementIf():
@@ -115,19 +116,34 @@ class StatementExecutor(LanguageVisitor):
     def visitStatementVariableDeclaration(self, ctx: LanguageParser.StatementVariableDeclarationContext):
         variable_name = ctx.IDENTIFIER().getText()
         if self._stack.find(variable_name) is not None:
-            raise VariableRedeclarationException([], [])
+            raise exceptions.VariableRedeclarationException([], [])
 
         value = self.visitExpression(ctx.expression())
         self._stack.peek().set_variable(variable_name, value)
 
-    def visitStatementAssignment(self, ctx: LanguageParser.StatementAssignmentContext):
+    def visitStatementAssignmentVariable(self, ctx: LanguageParser.StatementAssignmentVariableContext):
         variable_name = ctx.IDENTIFIER().getText()
         variable = self._stack.find(variable_name)
         if variable is None:
-            raise UnknownReferenceExcpetion(variable_name, None)
+            raise exceptions.UnknownReferenceExcpetion(variable_name, None)
 
         expression_value = self.visitExpression(ctx.expression())
         variable.value = expression_value.value if expression_value is not None else Value(Type.NULL, None)
+
+    def visitStatementAssignmentBracket(self, ctx: LanguageParser.StatementAssignmentBracketContext):
+        subject = self.visitExpressionPrimary(ctx.expressionPrimary())
+        index = self.visitExpression(ctx.expressionBracketAccess().expression())
+        to_assign = self.visitExpression(ctx.expression())
+
+        if subject.type != Type.LIST and subject.type != Type.MAP:
+            raise exceptions.TypeMismatchException("[] applied to invalid value.")
+        if subject.type == Type.LIST and index.type != Type.NUMBER:
+            raise exceptions.TypeMismatchException("List index must be number", None, index.type, Type.Number)
+
+        if subject.type == Type.LIST:
+            subject.value[int(index.value)] = to_assign
+        else:
+            subject.value[index.value] = to_assign
 
     def visitStatementFor(self, ctx: LanguageParser.StatementForContext):
         self.visitStatementVariableDeclaration(ctx.statementVariableDeclaration())
@@ -137,8 +153,8 @@ class StatementExecutor(LanguageVisitor):
             conditional = self.visitExpression(ctx.statementExpression().expression())
 
             if conditional.type is not Type.BOOL:
-                raise TypeMismatchException("For conditions must be type boolean", None, conditional.type,
-                                            Type.BOOL)
+                raise exceptions.TypeMismatchException("For conditions must be type boolean", None, conditional.type,
+                                                       Type.BOOL)
             if conditional.value:
                 ret = self.visitCodeBlock(ctx.codeBlock())
                 if ret is not None:
@@ -153,7 +169,8 @@ class StatementExecutor(LanguageVisitor):
     def visitStatementIf(self, ctx: LanguageParser.StatementIfContext):
         conditional = self.visitExpression(ctx.expression())
         if conditional.type is not Type.BOOL:
-            raise TypeMismatchException("If conditions must be type boolean", None, conditional.type, Type.BOOL)
+            raise exceptions.TypeMismatchException("If conditions must be type boolean", None, conditional.type,
+                                                   Type.BOOL)
 
         try:
             self._stack.push(Frame())
@@ -178,7 +195,8 @@ class StatementExecutor(LanguageVisitor):
             while True:
                 conditional = self.visitExpression(ctx.expression())
                 if conditional.type is not Type.BOOL:
-                    raise TypeMismatchException("If conditions must be type boolean", None, conditional.type, Type.BOOL)
+                    raise exceptions.TypeMismatchException("If conditions must be type boolean", None, conditional.type,
+                                                           Type.BOOL)
                 if conditional.value:
                     ret = self.visitCodeBlock(ctx.codeBlock())
                     if ret is not None:
@@ -201,7 +219,8 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionAnd(ctx.expressionAnd())
 
             if operand_one.type is not Type.BOOL or operand_two.type is not Type.BOOL:
-                raise TypeMismatchException("The or operator (||) can only be applied to values of type BOOL.", [])
+                raise exceptions.TypeMismatchException(
+                    "The or operator (||) can only be applied to values of type BOOL.", [])
 
             return Value(Type.BOOL, operand_one.value or operand_two.value)
 
@@ -214,7 +233,8 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionEquality(ctx.expressionEquality())
 
             if operand_one.type is not Type.BOOL or operand_two.type is not Type.BOOL:
-                raise TypeMismatchException("The and operator (&&) can only be applied to values of type BOOL.", [])
+                raise exceptions.TypeMismatchException(
+                    "The and operator (&&) can only be applied to values of type BOOL.", [])
 
             return Value(Type.BOOL, operand_one.value and operand_two.value)
 
@@ -244,7 +264,8 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionAdditive(expression_additive)
 
             if operand_one.type is not Type.NUMBER or operand_two.type is not Type.NUMBER:
-                raise TypeMismatchException("The relational operators can only be applied to values of type NUMBER.")
+                raise exceptions.TypeMismatchException(
+                    "The relational operators can only be applied to values of type NUMBER.")
 
             if ctx.LT_OP():
                 result = operand_one.value < operand_two.value
@@ -267,7 +288,8 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionMultiplicative(ctx.expressionMultiplicative())
 
             if operand_one.type is not Type.NUMBER or operand_two.type is not Type.NUMBER:
-                raise TypeMismatchException("The additive operators can only be applied to values of type NUMBER.")
+                raise exceptions.TypeMismatchException(
+                    "The additive operators can only be applied to values of type NUMBER.")
 
             if ctx.ADD_OP():
                 result = operand_one.value + operand_two.value
@@ -284,7 +306,7 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionUnary(ctx.expressionUnary())
 
             if operand_one.type is not Type.NUMBER or operand_two.type is not Type.NUMBER:
-                raise TypeMismatchException(
+                raise exceptions.TypeMismatchException(
                     "The multiplicative operators can only be applied to values of type NUMBER.")
 
             if ctx.MUL_OP():
@@ -307,7 +329,8 @@ class StatementExecutor(LanguageVisitor):
         if ctx.NOT_OP():
             operand = self.visitExpressionPrimary(ctx.expressionPrimary())
             if operand.type is not Type.BOOL:
-                raise TypeMismatchException("The not operator (!) can only be applied to values of type BOOL.")
+                raise exceptions.TypeMismatchException(
+                    "The not operator (!) can only be applied to values of type BOOL.")
 
             return Value(Type.BOOL, not operand.value)
 
@@ -318,7 +341,7 @@ class StatementExecutor(LanguageVisitor):
         if ctx.DEC_OP():
             operand = self.visitExpressionPrimary(ctx.expressionPrimary())
             if operand.type is not Type.NUMBER:
-                raise TypeMismatchException("The not dec (--) can only be applied to values of type NUMBER.")
+                raise exceptions.TypeMismatchException("The not dec (--) can only be applied to values of type NUMBER.")
 
             operand.value = operand.value - 1
             return operand
@@ -326,7 +349,7 @@ class StatementExecutor(LanguageVisitor):
         if ctx.INC_OP():
             operand = self.visitExpressionPrimary(ctx.expressionPrimary())
             if operand.type is not Type.NUMBER:
-                raise TypeMismatchException("The not dec (++) can only be applied to values of type NUMBER.")
+                raise exceptions.TypeMismatchException("The not dec (++) can only be applied to values of type NUMBER.")
 
             operand.value = operand.value + 1
             return operand
@@ -371,14 +394,15 @@ class StatementExecutor(LanguageVisitor):
         if bracket_access is not None:
             subject = self.visitExpressionPrimary(ctx.expressionPrimary())
             if subject.type != Type.LIST and subject.type != Type.MAP:
-                raise TypeMismatchException("[] applied to invalid value.")
+                raise exceptions.TypeMismatchException("[] applied to invalid value.")
             index = self.visitExpression(bracket_access.expression())
             if subject.type == Type.LIST and index.type != Type.NUMBER:
-                raise TypeMismatchException("List index must be number", None, index.type, Type.Number)
+                raise exceptions.TypeMismatchException("List index must be number", None, index.type, Type.Number)
             if subject.type == Type.LIST:
                 value = subject.value[int(index.value)].value
             else:
-                value = subject.value[index.value].value
+                temp = subject.value.get(index.value)
+                value = temp and temp.value
 
             return Value(get_type_of(value), value)
 
@@ -389,7 +413,7 @@ class StatementExecutor(LanguageVisitor):
         function_name = ctx.IDENTIFIER().getText()
         function = self._symbols.get_declared_function(function_name)
         if function is None:
-            raise UnknownFunctionException(function_name, [])
+            raise exceptions.UnknownFunctionException(function_name, [])
 
         arguments = map(lambda expression: self.visitExpression(expression), ctx.arguments().expression())
 
@@ -407,7 +431,7 @@ class StatementExecutor(LanguageVisitor):
         variable_name = ctx.IDENTIFIER().getText()
         found_variable = self._stack.find(variable_name)
         if found_variable is None:
-            raise UnknownReferenceExcpetion(variable_name, [])
+            raise exceptions.UnknownReferenceExcpetion(variable_name, [])
 
         return found_variable
 

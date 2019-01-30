@@ -54,6 +54,12 @@ class TypeMismatchException(RuntimeException):
         self.type_two = expected
 
 
+class NullPointerException(RuntimeException):
+
+    def __init__(self, user_message, code=None):
+        super().__init__(user_message, code)
+
+
 class CodePiece:
 
     def __init__(self, description, code):
