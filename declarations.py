@@ -49,6 +49,22 @@ class NativeFunction:
         raise Exception("Not implemented")
 
 
+class AsStringFunction(NativeFunction):
+
+    def __init__(self):
+        super().__init__("as_string")
+
+    def execute(self, arguments):
+        argument = arguments[0]
+
+        if argument.type == Type.NULL:
+            return "null"
+        if argument.type == Type.BOOL:
+            return "true" if argument.value else "false"
+
+        return Value(Type.STRING, str(argument.value))
+
+
 class SizeFunction(NativeFunction):
 
     def __init__(self):
@@ -104,6 +120,7 @@ class SymbolTable:
         self.add_function(PrintFunction())
         self.add_function(PrintLineFunction())
         self.add_function(SizeFunction())
+        self.add_function(AsStringFunction())
 
     def add_function(self, function):
         self._functions[function.name] = function

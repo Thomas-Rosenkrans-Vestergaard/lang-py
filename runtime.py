@@ -334,16 +334,22 @@ class StatementExecutor(LanguageVisitor):
             operand_one = self.visitExpressionAdditive(ctx.expressionAdditive())
             operand_two = self.visitExpressionMultiplicative(ctx.expressionMultiplicative())
 
-            if operand_one.type is not Type.NUMBER or operand_two.type is not Type.NUMBER:
-                raise exceptions.TypeMismatchException(
-                    "The additive operators can only be applied to values of type NUMBER.")
+            if operand_one.type != operand_two.type:
+                raise exceptions.TypeMismatchException("The additive operators must be applied to values of the same types.", None, operand_one.type, operand_two.type)
 
-            if ctx.ADD_OP():
-                result = operand_one.value + operand_two.value
-            else:  # SUB
-                result = operand_one.value - operand_two.value
+            # Numbers
+            if operand_one.type is Type.NUMBER:
+                if ctx.ADD_OP():
+                    return Value(Type.NUMBER, operand_one.value + operand_two.value)
+                else:  # SUB
+                    return Value(Type.NUMBER, operand_one.value - operand_two.value)
 
-            return Value(Type.NUMBER, result)
+            if operand_one.type is Type.STRING:
+                if ctx.ADD_OP():
+                    return Value(Type.STRING, operand_one.value + operand_two.value)
+                else:
+                    raise Exception("Unsupported string - string")
+
 
         return self.visitExpressionMultiplicative(ctx.expressionMultiplicative())
 
@@ -516,7 +522,7 @@ class StatementExecutor(LanguageVisitor):
         if function is None:
             raise exceptions.UnknownFunctionException(function_name, [])
 
-        arguments = map(lambda expression: self.visitExpression(expression), ctx.arguments().expression())
+        arguments = list(map(lambda expression: self.visitExpression(expression), ctx.arguments().expression()))
 
         if isinstance(function, UserFunction):
             new_frame = Frame()

@@ -1,9 +1,11 @@
 from exceptions import RuntimeException
 from runtime import ProgramExecutor
+import sys
 
 
 def run(code):
     try:
+        sys.setrecursionlimit(250000)
         executor = ProgramExecutor()
         executor.execute(code)
     except RuntimeException as e:
@@ -23,8 +25,8 @@ class Person {
         this.age = age;
     }
     
-    func get_name() {
-        return this.name;
+    func get_description() {
+        return 'Name is ' + this.name + ', age is ' + as_string(this.age); 
     }
 }
 
@@ -32,6 +34,13 @@ const NAME = 'Thomas';
 const COOL = true;
 const PI = 3.14;
 const NULLABLE = null;
+
+func fib(n) {
+    if(n == 1)
+        return n;
+    
+    return fib(n - 1) + fib(n - 2); 
+}
 
 func sum(a, b) {
     return a + b;
@@ -117,6 +126,8 @@ numbers[0] = 5;
 print_ln(numbers[0]);
 
 var person = new Person('Thomas', 21);
-print_ln(person.get_name());
+print_ln(person.get_description());
+
+print_ln('Fib of 5: ' + fib(5));
 
 """)
