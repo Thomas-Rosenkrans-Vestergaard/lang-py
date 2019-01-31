@@ -10,14 +10,28 @@ class Type(Enum):
     NULL = 3
     LIST = 4
     MAP = 5
-    OBJECT = 6
+    CUSTOM_OBJECT = 6
 
 
 class Value:
 
-    def __init__(self, type: Type, value):
+    def __init__(self, type: Type, value, methods=None, fields=None):
+
+        if methods is None:
+            methods = {}
+        if fields is None:
+            fields = {}
+
         self.type = type
         self.value = value
+        self.methods = methods
+        self.fields = fields
+
+    def replace(self, value):
+        self.type = value.type
+        self.value = value.value
+        self.methods = value.methods
+        self.fields = value.fields
 
     def to_string(self):
         if self.type == Type.BOOL:
@@ -36,6 +50,7 @@ class Value:
             "null",
             "list",
             "map",
+            "c_obj"
         ]
 
         return type_names[self.type.value]

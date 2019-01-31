@@ -46,6 +46,12 @@ class UnknownFunctionException(RuntimeException):
         super().__init__("Unknown function with name " + function_name, code)
 
 
+class UnknownClassException(RuntimeException):
+
+    def __init__(self, class_name, code=None):
+        super().__init__("Unknown class with name " + class_name, code)
+
+
 class TypeMismatchException(RuntimeException):
 
     def __init__(self, user_message, code=None, found=None, expected=None):
@@ -60,8 +66,19 @@ class NullPointerException(RuntimeException):
         super().__init__(user_message, code)
 
 
-class CodePiece:
+class UnknownMethodException(RuntimeException):
 
-    def __init__(self, description, code):
-        self.description = description
+    def __init__(self, value, method_name, code=None):
+        super().__init__("Type " + value.get_type_name() + " does not have method " + method_name)
+        self.value = value
+        self.method_name = method_name
+        self.code = code
+
+
+class UnknownFieldException(RuntimeException):
+
+    def __init__(self, value, field_name, code=None):
+        super().__init__("Type " + value.get_type_name() + " does not have field " + field_name, code)
+        self.value = value
+        self.field_name = field_name
         self.code = code

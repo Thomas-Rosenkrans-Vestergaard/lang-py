@@ -1,6 +1,27 @@
-from antlr.LanguageListener import *
-from antlr.LanguageVisitor import *
-from value import eval_expression_literal, Value, Type
+from value import Value, Type
+
+
+class Field:
+
+    def __init__(self, name, default_expression):
+        self.name = name
+        self.default_expression = default_expression
+
+
+class Class:
+
+    def __init__(self, name, constructor, methods, fields):
+        self.name = name
+        self.constructor = constructor
+        self.methods = methods
+        self.fields = fields
+
+
+class Method:
+
+    def __init__(self, parameters, code_block):
+        self.parameters = parameters
+        self.code = code_block
 
 
 class Constant:
@@ -44,6 +65,7 @@ class SizeFunction(NativeFunction):
     def size_of(value):
         return len(value.value)
 
+
 class PrintFunction(NativeFunction):
 
     def __init__(self):
@@ -66,15 +88,18 @@ class PrintLineFunction(NativeFunction):
 
 class SymbolTable:
 
-    def __init__(self, functions=None, constants=None):
+    def __init__(self, functions=None, constants=None, classes=None):
 
         if functions is None:
             functions = {}
         if constants is None:
             constants = {}
+        if classes is None:
+            classes = {}
 
         self._functions = functions
         self._constants = constants
+        self._classes = classes
 
         self.add_function(PrintFunction())
         self.add_function(PrintLineFunction())
@@ -82,12 +107,6 @@ class SymbolTable:
 
     def add_function(self, function):
         self._functions[function.name] = function
-
-    def get_declared_functions(self):
-        return self._functions
-
-    def get_declared_constants(self):
-        return self._constants
 
     def get_declared_function(self, name):
         return self._functions.get(name)
@@ -97,4 +116,10 @@ class SymbolTable:
         return found and found.value
 
     def add_constant(self, constant):
-        self._constants[constant] = constant
+        self._constants[constant.name] = constant
+
+    def add_class(self, clazz):
+        self._classes[clazz.name] = clazz
+
+    def get_declared_class(self, class_name):
+        return self._classes[class_name]

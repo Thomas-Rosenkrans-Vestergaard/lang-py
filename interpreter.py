@@ -1,9 +1,14 @@
+from exceptions import RuntimeException
 from runtime import ProgramExecutor
 
 
 def run(code):
-    executor = ProgramExecutor()
-    executor.execute(code)
+    try:
+        executor = ProgramExecutor()
+        executor.execute(code)
+    except RuntimeException as e:
+        print("An error occurred:")
+        print(e.user_message)
 
 
 run("""

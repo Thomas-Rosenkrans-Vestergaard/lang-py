@@ -1,5 +1,5 @@
 from antlr.LanguageVisitor import *
-from declarations import SymbolTable, UserFunction, Constant
+from declarations import SymbolTable, UserFunction, Constant, Class, Method, Field
 import exceptions
 from value import eval_expression_literal, Type, Value, get_type_of
 from antlr4 import InputStream, CommonTokenStream
@@ -57,16 +57,51 @@ class StatementExecutor(LanguageVisitor):
 
     def visitDeclarationFunction(self, ctx: LanguageParser.DeclarationFunctionContext):
         name = ctx.functionSignature().IDENTIFIER().getText()
-        self._symbols.add_function(UserFunction(name, self._get_function_arguments(ctx), self._get_function_code(ctx)))
+        self._symbols.add_function(UserFunction(name, self._get_parameters(ctx.functionSignature().parameters()),
+                                                self._get_function_code(ctx)))
 
     @staticmethod
-    def _get_function_arguments(ctx: LanguageParser.DeclarationFunctionContext):
-        identifiers = ctx.functionSignature().parameters().IDENTIFIER()
+    def _get_parameters(ctx: LanguageParser.ParametersContext):
+        identifiers = ctx.IDENTIFIER()
         return list(map(lambda i: i.getText(), identifiers))
 
     @staticmethod
     def _get_function_code(ctx: LanguageParser.DeclarationFunctionContext):
         return ctx.codeBlock()
+
+    def visitDeclarationClass(self, ctx: LanguageParser.DeclarationClassContext):
+        class_name = ctx.IDENTIFIER().getText()
+        class_constructor = self.visitDeclarationConstructor(ctx.declarationConstructor())
+        class_methods = self.collect_class_methods(ctx.declarationFunction())
+        class_fields = self.collect_class_fields(ctx.declarationField())
+        class_instance = Class(class_name, class_constructor, class_methods, class_fields)
+        self._symbols.add_class(class_instance)
+
+    def visitDeclarationConstructor(self, ctx: LanguageParser.DeclarationConstructorContext):
+        if ctx is None:
+            return None
+
+        return Method(self._get_parameters(ctx.parameters()), ctx.codeBlock())
+
+    def collect_class_methods(self, functions):
+
+        result = {}
+        for function in functions:
+            signature = function.functionSignature()
+            name = signature.IDENTIFIER().getText()
+            result[name] = UserFunction(name, self._get_parameters(signature.parameters()),
+                                        self._get_function_code(function))
+
+        return result
+
+    def collect_class_fields(self, fields):
+        result = {}
+        for field in fields:
+            name = field.IDENTIFIER().getText()
+            default_expression = field.expression()
+            result[name] = Field(name, default_expression)
+
+        return result
 
     def visitDeclarationConstant(self, ctx: LanguageParser.DeclarationConstantContext):
         name = ctx.IDENTIFIER().getText()
@@ -99,6 +134,8 @@ class StatementExecutor(LanguageVisitor):
             return self.visitStatementAssignmentVariable(ctx.statementAssignmentVariable())
         if ctx.statementAssignmentBracket():
             return self.visitStatementAssignmentBracket(ctx.statementAssignmentBracket())
+        if ctx.statementAssignmentField():
+            return self.visitStatementAssignmentField(ctx.statementAssignmentField())
         if ctx.statementReturn():
             return self.visitStatementReturn(ctx.statementReturn())
         if ctx.statementIf():
@@ -144,6 +181,16 @@ class StatementExecutor(LanguageVisitor):
             subject.value[int(index.value)] = to_assign
         else:
             subject.value[index.value] = to_assign
+
+    def visitStatementAssignmentField(self, ctx: LanguageParser.StatementAssignmentFieldContext):
+        subject = self.visitExpressionPrimary(ctx.expressionPrimary())
+        field_name = ctx.expressionFieldAccess().IDENTIFIER().getText()
+        field_instance = subject.fields.get(field_name)
+        if field_instance is None:
+            raise exceptions.UnknownFieldException(subject, field_name)
+
+        to_assign = self.visitExpression(ctx.expression())
+        field_instance.replace(to_assign)
 
     def visitStatementFor(self, ctx: LanguageParser.StatementForContext):
         self.visitStatementVariableDeclaration(ctx.statementVariableDeclaration())
@@ -384,15 +431,36 @@ class StatementExecutor(LanguageVisitor):
 
         field_access = ctx.expressionFieldAccess()
         if field_access is not None:
-            raise Exception("Unsupported: field access")
+            field_name = field_access.IDENTIFIER().getText()
+            subject = self.visitExpressionPrimary(ctx.expressionPrimary())
+            field_value = subject.fields.get(field_name)
+            if field_value is None:
+                raise exceptions.UnknownFieldException(subject, field_name)
+
+            return field_value
 
         method_access = ctx.expressionMethodAccess()
         if method_access is not None:
-            raise Exception("Unsupported: method call")
+            method_name = method_access.IDENTIFIER().getText()
+            subject = self.visitExpressionPrimary(ctx.expressionPrimary())
+            method_instance = subject.methods.get(method_name)
+
+            if method_instance is None:
+                raise exceptions.UnknownMethodException(subject, method_name)
+
+            arguments = map(lambda expression: self.visitExpression(expression), method_access.arguments().expression())
+
+            new_frame = Frame()
+            new_frame.set_variables(zip(method_instance.parameters, arguments))
+            new_frame.set_variable("this", subject)
+            self._stack.push(new_frame)
+            result = self.visitCodeBlock(method_instance.code)
+            self._stack.pop()
+            return result
 
         new_expression = ctx.expressionNew()
         if new_expression is not None:
-            raise Exception("Unsupported: new keyword")
+            return self.visitExpressionNew(new_expression)
 
         bracket_access = ctx.expressionBracketAccess()
         if bracket_access is not None:
@@ -409,6 +477,35 @@ class StatementExecutor(LanguageVisitor):
                 value = temp and temp.value
 
             return Value(get_type_of(value), value)
+
+    def visitExpressionNew(self, ctx: LanguageParser.ExpressionNewContext):
+        class_name = ctx.IDENTIFIER().getText()
+        class_instance = self._symbols.get_declared_class(class_name)
+        if class_instance is None:
+            raise exceptions.UnknownClassException(class_name)
+
+        arguments = map(lambda expression: self.visitExpression(expression), ctx.arguments().expression())
+
+        # init null values
+        field_values = {}
+        for k, field in class_instance.fields.items():
+            if field.default_expression is None:
+                field_values[k] = Value(Type.NULL, None)
+            else:
+                field_values[k] = self.visitExpression(field.default_expression)
+
+        instance = Value(Type.CUSTOM_OBJECT, None, class_instance.methods, field_values)
+
+        # execute constructor
+        if class_instance.constructor is not None:
+            new_frame = Frame()
+            new_frame.set_variables(zip(class_instance.constructor.parameters, arguments))
+            new_frame.set_variable("this", instance)
+            self._stack.push(new_frame)
+            self.visitCodeBlock(class_instance.constructor.code)
+            self._stack.pop()
+
+        return instance
 
     def visitExpressionParenthesized(self, ctx: LanguageParser.ExpressionParenthesizedContext):
         return self.visitExpression(ctx.expression())
@@ -432,10 +529,18 @@ class StatementExecutor(LanguageVisitor):
         return function.execute(arguments)
 
     def visitExpressionVariable(self, ctx: LanguageParser.ExpressionVariableContext):
+
+        if ctx.THIS() is not None:
+            this_context = self._stack.find("this")
+            if this_context is None:
+                raise exceptions.UnknownReferenceExcpetion("this", None)
+
+            return this_context
+
         variable_name = ctx.IDENTIFIER().getText()
         found_variable = self._stack.find(variable_name)
         if found_variable is None:
-            raise exceptions.UnknownReferenceExcpetion(variable_name, [])
+            raise exceptions.UnknownReferenceExcpetion(variable_name, None)
 
         return found_variable
 
