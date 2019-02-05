@@ -2,10 +2,10 @@ from exceptions import RuntimeException
 from runtime import ProgramExecutor
 import sys
 
-
 def run(code):
     try:
-        sys.setrecursionlimit(250000)
+        # resource.setrlimit(resource.RLIMIT_STACK, [0x10000000, resource.RLIM_INFINITY])
+        sys.setrecursionlimit(0x100000)
         executor = ProgramExecutor()
         executor.execute(code)
     except RuntimeException as e:
@@ -36,7 +36,7 @@ const PI = 3.14;
 const NULLABLE = null;
 
 func fib(n) {
-    if(n == 1)
+    if(n < 2)
         return n;
     
     return fib(n - 1) + fib(n - 2); 
@@ -48,7 +48,7 @@ func sum(a, b) {
 
 func recursive_sum(n) {
     if(n < 2)
-        return 1;
+        return n;
     
     return n + recursive_sum(n - 1);
 }
@@ -128,6 +128,6 @@ print_ln(numbers[0]);
 var person = new Person('Thomas', 21);
 print_ln(person.get_description());
 
-print_ln('Fib of 5: ' + fib(5));
+print_ln('Fib of 5: ' + as_string(fib(5)));
 
 """)
