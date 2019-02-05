@@ -335,7 +335,9 @@ class StatementExecutor(LanguageVisitor):
             operand_two = self.visitExpressionMultiplicative(ctx.expressionMultiplicative())
 
             if operand_one.type != operand_two.type:
-                raise exceptions.TypeMismatchException("The additive operators must be applied to values of the same types.", None, operand_one.type, operand_two.type)
+                raise exceptions.TypeMismatchException(
+                    "The additive operators must be applied to values of the same types.", None, operand_one.type,
+                    operand_two.type)
 
             # Numbers
             if operand_one.type is Type.NUMBER:
@@ -349,7 +351,6 @@ class StatementExecutor(LanguageVisitor):
                     return Value(Type.STRING, operand_one.value + operand_two.value)
                 else:
                     raise Exception("Unsupported string - string")
-
 
         return self.visitExpressionMultiplicative(ctx.expressionMultiplicative())
 
@@ -435,6 +436,10 @@ class StatementExecutor(LanguageVisitor):
         if expression_lit is not None:
             return self.visitExpressionLiteral(expression_lit)
 
+        expression_closure = ctx.expressionClosure()
+        if expression_closure is not None:
+            return self.visitExpressionClosure(expression_closure)
+
         field_access = ctx.expressionFieldAccess()
         if field_access is not None:
             field_name = field_access.IDENTIFIER().getText()
@@ -444,6 +449,28 @@ class StatementExecutor(LanguageVisitor):
                 raise exceptions.UnknownFieldException(subject, field_name)
 
             return field_value
+
+        closure_invocation = ctx.expressionClosureInvocation()
+        if closure_invocation is not None:
+            subject = self.visitExpressionPrimary(ctx.expressionPrimary())
+            closure = subject.value
+            if subject.type != Type.CLOSURE:
+                raise exceptions.TypeMismatchException("Cannot only use .() operator on CLOSURE.", None, subject.type,
+                                                       Type.CLOSURE)
+
+            arguments = map(lambda expression: self.visitExpression(expression),
+                            closure_invocation.arguments().expression())
+
+            new_frame = Frame()
+            new_frame.set_variables(zip(closure.parameters, arguments))
+            self._stack.push(new_frame)
+            if closure.expression is not None:
+                result = self.visitExpression(closure.expression)
+            else:
+                result = self.run_returnable(closure.statements)
+
+            self._stack.pop()
+            return result
 
         method_access = ctx.expressionMethodAccess()
         if method_access is not None:
@@ -570,6 +597,20 @@ class StatementExecutor(LanguageVisitor):
 
     def visitExpressionLiteral(self, ctx: LanguageParser.ExpressionLiteralContext):
         return eval_expression_literal(ctx)
+
+    def visitExpressionClosure(self, ctx: LanguageParser.ExpressionClosureContext):
+        identifiers = ctx.parameters().IDENTIFIER()
+        parameters = list(map(lambda i: i.getText(), identifiers))
+        closure = Closure(parameters, ctx.expression(), ctx.statement())
+        return Value(Type.CLOSURE, closure)
+
+
+class Closure:
+
+    def __init__(self, parameters, expression, statements):
+        self.parameters = parameters
+        self.expression = expression;
+        self.statements = statements
 
 
 class Frame:

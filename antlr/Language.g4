@@ -169,9 +169,11 @@ expressionPrimary
     |   expressionList
     |   expressionMap
     |   expressionLiteral
+    |   expressionClosure
     |   expressionPrimary expressionFieldAccess
     |   expressionPrimary expressionMethodAccess
     |   expressionPrimary expressionBracketAccess
+    |   expressionPrimary expressionClosureInvocation
     ;
 
 expressionFieldAccess
@@ -188,6 +190,10 @@ expressionMethodAccess
 
 expressionBracketAccess
     :   BRACK_OPEN expression BRACK_CLOSE
+    ;
+
+expressionClosureInvocation
+    :    DOT arguments
     ;
 
 expressionList
@@ -232,6 +238,10 @@ expressionLiteral
     |   NULL
     ;
 
+expressionClosure
+    :   parameters ARROW (expression | (CURLY_OPEN statement* CURLY_CLOSE))
+    ;
+
 NUMBER_VAL   : [0-9]+ ('.' [0-9]+)?;
 STRING_VAL   : QUOTE (ESCAPED_CHAR | ~['])* QUOTE;
 ESCAPED_CHAR :   '\\' .;
@@ -256,6 +266,7 @@ NEQ_OP    : '!=';
 NOT_OP    : '!';
 DEC_OP    : '--';
 INC_OP    : '++';
+ARROW     : '=>';
 
 TYPE   : 'type';
 VAR    : 'var';

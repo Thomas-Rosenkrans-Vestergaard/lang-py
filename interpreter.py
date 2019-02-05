@@ -35,6 +35,21 @@ const COOL = true;
 const PI = 3.14;
 const NULLABLE = null;
 
+func list_map(list, callback) {
+    var s = size(list);
+    var result = [];
+    for(var i = 0; i < s; i++)
+        list_push(result, callback.(list[i], i, list));
+        
+    return result;
+}
+
+func list_each(list, callback) {
+    var s = size(list);
+    for(var i = 0; i < s; i++)
+        callback.(list[i], i, list);
+}
+
 func fib(n) {
     if(n < 2)
         return n;
@@ -121,13 +136,15 @@ map['Kasper'] = 'Nice';
 print_ln(map['Kasper']);
 print_ln(map['Unknown']);
 
-var numbers = [1, 2, 3];
-numbers[0] = 5;
-print_ln(numbers[0]);
-
 var person = new Person('Thomas', 21);
 print_ln(person.get_description());
 
-print_ln('Fib of 5: ' + as_string(fib(5)));
+var cls = () => 'Alexander';
+print_ln('result=' + cls.());
+
+var numbers = [1, 2, 3, 4, 5];
+var squared = list_map(numbers, (n) => n ^ 2);
+list_each(squared, (n) => print_ln(n));
+print_ln(type (n) => n);
 
 """)

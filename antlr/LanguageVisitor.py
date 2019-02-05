@@ -176,6 +176,11 @@ class LanguageVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by LanguageParser#expressionClosureInvocation.
+    def visitExpressionClosureInvocation(self, ctx:LanguageParser.ExpressionClosureInvocationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by LanguageParser#expressionList.
     def visitExpressionList(self, ctx:LanguageParser.ExpressionListContext):
         return self.visitChildren(ctx)
@@ -213,6 +218,11 @@ class LanguageVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by LanguageParser#expressionLiteral.
     def visitExpressionLiteral(self, ctx:LanguageParser.ExpressionLiteralContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by LanguageParser#expressionClosure.
+    def visitExpressionClosure(self, ctx:LanguageParser.ExpressionClosureContext):
         return self.visitChildren(ctx)
 
 

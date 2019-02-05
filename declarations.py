@@ -1,3 +1,4 @@
+import exceptions
 from value import Value, Type
 
 
@@ -65,6 +66,19 @@ class AsStringFunction(NativeFunction):
         return Value(Type.STRING, str(argument.value))
 
 
+class ListPushFunction(NativeFunction):
+
+    def __init__(self):
+        super().__init__("list_push")
+
+    def execute(self, arguments):
+        list = arguments[0]
+        if list.type != Type.LIST:
+            raise exceptions.TypeMismatchException("list_push must be called on list.", None, list.type, Type.LIST)
+
+        for to_push in arguments[1:]:
+            list.value.append(to_push)
+
 class SizeFunction(NativeFunction):
 
     def __init__(self):
@@ -121,6 +135,7 @@ class SymbolTable:
         self.add_function(PrintLineFunction())
         self.add_function(SizeFunction())
         self.add_function(AsStringFunction())
+        self.add_function(ListPushFunction())
 
     def add_function(self, function):
         self._functions[function.name] = function

@@ -11,6 +11,7 @@ class Type(Enum):
     LIST = 4
     MAP = 5
     CUSTOM_OBJECT = 6
+    CLOSURE = 7
 
 
 class Value:
@@ -38,6 +39,8 @@ class Value:
             return "true" if self.value else "false"
         if self.type == Type.NULL:
             return "null"
+        if self.type == Type.CLOSURE:
+            return "closure"
 
         return str(self.value)
 
@@ -50,7 +53,8 @@ class Value:
             "null",
             "list",
             "map",
-            "c_obj"
+            "c_obj",
+            "closure"
         ]
 
         return type_names[self.type.value]

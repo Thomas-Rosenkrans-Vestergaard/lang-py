@@ -311,6 +311,15 @@ class LanguageListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LanguageParser#expressionClosureInvocation.
+    def enterExpressionClosureInvocation(self, ctx:LanguageParser.ExpressionClosureInvocationContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#expressionClosureInvocation.
+    def exitExpressionClosureInvocation(self, ctx:LanguageParser.ExpressionClosureInvocationContext):
+        pass
+
+
     # Enter a parse tree produced by LanguageParser#expressionList.
     def enterExpressionList(self, ctx:LanguageParser.ExpressionListContext):
         pass
@@ -380,6 +389,15 @@ class LanguageListener(ParseTreeListener):
 
     # Exit a parse tree produced by LanguageParser#expressionLiteral.
     def exitExpressionLiteral(self, ctx:LanguageParser.ExpressionLiteralContext):
+        pass
+
+
+    # Enter a parse tree produced by LanguageParser#expressionClosure.
+    def enterExpressionClosure(self, ctx:LanguageParser.ExpressionClosureContext):
+        pass
+
+    # Exit a parse tree produced by LanguageParser#expressionClosure.
+    def exitExpressionClosure(self, ctx:LanguageParser.ExpressionClosureContext):
         pass
 
 
