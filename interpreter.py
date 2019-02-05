@@ -50,6 +50,15 @@ func list_each(list, callback) {
         callback.(list[i], i, list);
 }
 
+func list_reduce(list, initial, callback) {
+    var s = size(list);
+    var acc = initial;
+    for(var i = 0; i < s; i++)
+        acc = callback.(acc, list[i], i, list);
+        
+    return acc;
+}
+
 func fib(n) {
     if(n < 2)
         return n;
@@ -146,5 +155,8 @@ var numbers = [1, 2, 3, 4, 5];
 var squared = list_map(numbers, (n) => n ^ 2);
 list_each(squared, (n) => print_ln(n));
 print_ln(type (n) => n);
+
+
+print(list_reduce([1, 2, 3, 4, 5], 0, (acc, n) => acc + n));
 
 """)
